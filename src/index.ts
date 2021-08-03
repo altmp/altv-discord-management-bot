@@ -52,14 +52,14 @@ client.on('clickMenu', async (menu) => {
         if (menu.values.includes(value.name)) {
             let addrole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
             if (addrole == undefined || addrole == null) {
-                console.warn("Dropdown Role not found!");
+                console.warn("Dropdown Role not found! ID: " + value.role);
                 return;
             }
             menu.clicker.member.roles.add(addrole);
         } else {
             let removerole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
             if (removerole == undefined || removerole == null) {
-                console.warn("Dropdown Role not found!");
+                console.warn("Dropdown Role not found! ID: " + value.role);
                 return;
             }
             menu.clicker.member.roles.remove(removerole);
