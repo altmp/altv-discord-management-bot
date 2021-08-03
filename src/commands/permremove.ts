@@ -3,6 +3,7 @@ import { ICommand } from '../interfaces/ICommand';
 import { getGuild } from '../index';
 import PermissionService from '../service/permissions';
 import RegexUtility from '../utility/regex';
+import CommandService from '../service/commands';
 
 const command: ICommand = {
     command: 'permremove',
@@ -17,17 +18,25 @@ const command: ICommand = {
         }
 
         if (!guildMember.hasPermission('ADMINISTRATOR', { checkAdmin: true, checkOwner: true })) {
-            msg.reply('no');
             return;
         }
 
         if (!commandName) {
-            msg.reply('no cmd')
             return;
         }
 
         if (!discordRole) {
-            msg.reply('no role');
+            return;
+        }
+
+        const command = CommandService.getCommand(commandName);
+        if (!command) {
+            msg.reply(`Command ${commandName} does not exist.`);
+            return;
+        }
+
+        if (command && command.skipPermissionCheck) {
+            msg.reply(`Command ${commandName} is already hard-coded accessible to everyone.`);
             return;
         }
 

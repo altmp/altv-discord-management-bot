@@ -3,11 +3,12 @@ import { ICommand } from '../interfaces/ICommand';
 import { getGuild } from '../index';
 import PermissionService from '../service/permissions';
 import RegexUtility from '../utility/regex';
+import CommandService from '../service/commands';
 
 const command: ICommand = {
     command: 'permadd',
     description: '[command_name] [role_id] - Add permission to a command by Role.',
-    execute: async (msg: Discord.Message, commandName: string, discordRole: string, toggleAllAccess = false) => {
+    execute: async (msg: Discord.Message, commandName: string, discordRole: string) => {
         discordRole = RegexUtility.parseRoleID(discordRole);
 
         const guild = getGuild();
@@ -22,33 +23,31 @@ const command: ICommand = {
         }
 
         if (!commandName) {
-            msg.reply('no cmd')
             return;
         }
 
         if (!discordRole) {
-            msg.reply('no role');
             return;
         }
 
-        if (toggleAllAccess === 'true') {
-            toggleAllAccess = true;
-        } else {
-            toggleAllAccess = false;
+        const command = CommandService.getCommand(commandName);
+        if (!command) {
+            msg.reply(`Command ${commandName} does not exist.`);
+            return;
         }
 
-        const result = await PermissionService.add(commandName, discordRole, toggleAllAccess);
+        if (command && command.skipPermissionCheck) {
+            msg.reply(`Command ${commandName} is already hard-coded accessible to everyone.`);
+            return;
+        }
+
+        const result = await PermissionService.add(commandName, discordRole);
         if (!result) {
             msg.reply(`Command ${commandName} may not exist, or ${discordRole} may not exist.`);
             return;
         }
 
         let reply = `Command ${commandName} can now be executed by <@&${discordRole}>.`
-        if (toggleAllAccess) {
-            const binding = PermissionService.get(commandName);
-            reply += ` All access was also toggled and now set to: ${binding.allAccess}`;
-        }
-
         msg.reply(reply);
     }
 }

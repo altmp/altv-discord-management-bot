@@ -21,11 +21,4 @@ export interface ICommandBinding {
      * @memberof ICommandBinding
      */
     roles: Array<string>;
-
-    /**
-     * Make this command available for everyone.
-     * @type {boolean}
-     * @memberof ICommandBinding
-     */
-    allAccess?: boolean;
 }

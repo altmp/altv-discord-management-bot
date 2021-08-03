@@ -36,19 +36,12 @@ const command: ICommand = {
             addedInfo = true;
         }
 
-        if (commandBinding) {
-            if (commandBinding.allAccess && !command.skipPermissionCheck) {
-                description += `everyone\n`;
-                addedInfo = true;
+        if (commandBinding && commandBinding.roles.length >= 1) {
+            for(let i = 0; i < commandBinding.roles.length; i++) {
+                description += `<@&${commandBinding.roles[i]}>\n`;
             }
 
-            if (commandBinding.roles.length >= 1) {
-                for(let i = 0; i < commandBinding.roles.length; i++) {
-                    description += `<@&${commandBinding.roles[i]}>\n`;
-                }
-    
-                addedInfo = true;
-            }
+            addedInfo = true;
         }
        
         if (!addedInfo) {

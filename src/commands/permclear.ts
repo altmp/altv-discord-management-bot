@@ -15,12 +15,21 @@ const command: ICommand = {
         }
 
         if (!guildMember.hasPermission('ADMINISTRATOR', { checkAdmin: true, checkOwner: true })) {
-            msg.reply('no');
             return;
         }
 
         if (!commandName) {
-            msg.reply('no cmd')
+            return;
+        }
+
+        const command = CommandService.getCommand(commandName);
+        if (!command) {
+            msg.reply(`Command ${commandName} does not exist.`);
+            return;
+        }
+
+        if (command && command.skipPermissionCheck) {
+            msg.reply(`Command ${commandName} is already hard-coded accessible to everyone.`);
             return;
         }
 

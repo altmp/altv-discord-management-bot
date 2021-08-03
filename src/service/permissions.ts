@@ -25,6 +25,7 @@ export default class PermissionService {
 
     /**
      * Check if the member has a role for this command's execution.
+     * Already checks hard-coded all-access outright.
      * @static
      * @param {Discord.GuildMember} member
      * @param {string} commandName
@@ -47,10 +48,6 @@ export default class PermissionService {
             return false;
         }
 
-        if (commandBindings[index].allAccess) {
-            return true;
-        }
-
         const validRoles = commandBindings[index].roles;
         return validRoles.some(role => guildMember.roles.cache.get(role));
     }
@@ -65,7 +62,7 @@ export default class PermissionService {
      * @return {*}  {Promise<boolean>}
      * @memberof PermissionService
      */
-    static async add(commandName: string, role: string | null, toggleAllAccess: boolean = false): Promise<boolean> {
+    static async add(commandName: string, role: string | null): Promise<boolean> {
         commandName = commandName.toLowerCase();
         const commandExists = CommandService.getCommand(commandName);
 
@@ -75,7 +72,7 @@ export default class PermissionService {
 
         let index = commandBindings.findIndex(binding => binding.command === commandName);
         if (index <= -1) {
-            commandBindings.push({ command: commandName, roles: [], allAccess: false });
+            commandBindings.push({ command: commandName, roles: [] });
             index = commandBindings.length - 1;
         }
 
@@ -92,10 +89,6 @@ export default class PermissionService {
             if (!roleIsValid) {
                 return false;
             }
-        }
-        
-        if (toggleAllAccess) {
-            commandBindings[index].allAccess = !commandBindings[index].allAccess;
         }
 
         return await DatabaseService.updateData({ commandBindings });
@@ -149,7 +142,6 @@ export default class PermissionService {
         }
 
         commandBindings[index].roles = [];
-        commandBindings[index].allAccess = false;
         return await DatabaseService.updateData({ commandBindings });
     }
 
