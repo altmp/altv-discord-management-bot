@@ -8,7 +8,6 @@ import generateEmbed from '../utility/embed';
 import { DatabaseService } from './database';
 
 let logBindings: Array<ILogBinding> = []
-let commandLogs: Array<ILog> = [];
 
 export class LoggerService {
     static async init() {
@@ -28,8 +27,14 @@ export class LoggerService {
      * @param {LOG_TYPES} type
      * @memberof LoggerService
      */
-    static setLoggerChannel(channelID: string, type: LOG_TYPES) {
-        const data: ILogBinding = { type, channel: channelID };
+    static async setLoggerChannel(channelID: string, type: string): Promise<boolean> {
+        type = type.toUpperCase();
+
+        if (!Object.keys(LOG_TYPES).find(x => x === type)) {
+            return false;
+        }
+
+        const data: ILogBinding = { type: LOG_TYPES[type], channel: channelID };
         const index = logBindings.findIndex(x => x.type === type);
         if (index >= 0) {
             logBindings[index] = data;
@@ -37,7 +42,7 @@ export class LoggerService {
             logBindings.push(data);
         }
 
-        DatabaseService.updateData({ logBindings });
+        return await DatabaseService.updateData({ logBindings });
     }
 
     /**
@@ -49,9 +54,12 @@ export class LoggerService {
      */
     static logMessage(data: ILog) {
         data.timestamp = Date.now();
-        commandLogs.push(data);
 
         const guild = getGuild();
+        if (!guild) {
+            console.warn(`No guild was found for logging.`);
+            return;
+        }
 
         const logBinding = logBindings.find(binding => binding.type === data.type);
 
@@ -66,7 +74,7 @@ export class LoggerService {
             return;
         }
 
-        const embed = generateEmbed(`[${new Date(data.timestamp).toUTCString()}] ${data.type}`, data.msg)
+        const embed = generateEmbed(`[${data.timestamp}] ${data.type.toUpperCase()} LOGS`, data.msg)
         channel.send(embed);
     }
 }
