@@ -10,7 +10,6 @@ This uses environment variables. You either use a `.env` file or pass environmen
 
 ```
 DATABASE_URL=''
-DATABASE_NAME=''
 DISCORD_BOT_TOKEN=''
 PREFIX=''
 ```

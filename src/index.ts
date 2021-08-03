@@ -1,42 +1,8 @@
 import * as Discord from 'discord.js';
-import * as dotenv from 'dotenv';
 
-import { IConfig } from './interfaces/IConfig';
 import CommandService from './service/commands';
-
-import './enums/collections';
-
-const config: IConfig = dotenv.config().parsed as IConfig;
-
-let commandPrefix;
-
-if (config.PREFIX) {
-    commandPrefix = config.PREFIX;
-} else if (process.env.PREFIX) {
-    commandPrefix = process.env.PREFIX;
-} else {
-    commandPrefix = '+'
-}
-
-// if (!config.DATABASE_URL) {
-//     throw new Error(`Missing DATABASE_URL from env variables.`);
-// }
-
-// if (!config.DATABASE_NAME) {
-//     throw new Error(`Missing DATABASE_NAME from env variables.`);
-// }
-
-if (!config.DISCORD_BOT_TOKEN) {
-    throw new Error(`Missing DISCORD_BOT_TOKEN from env variables.`);
-}
-
-// new Database(
-//     config.DATABASE_URL,
-//     config.DATABASE_NAME,
-//     [COLLECTIONS.GENERAL],
-//     config.DATABASE_USERNAME,
-//     config.DATABASE_PASSWORD
-// );
+import getPrefix from './utility/prefix';
+import getToken from './utility/token';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -55,7 +21,7 @@ client.on('message', (msg: Discord.Message) => {
         return;
     }
 
-    if (!msg.content.startsWith(commandPrefix)) {
+    if (!msg.content.startsWith(getPrefix())) {
         return;
     }
 
@@ -74,7 +40,6 @@ client.on('message', (msg: Discord.Message) => {
         return;
     }
 
-    // Execute Command with args
     commandRef.execute(msg, ...args);
 });
 
@@ -91,8 +56,8 @@ export function getGuild(): Discord.Guild {
 }
 
 async function finishConnection() {
-    client.login(config.DISCORD_BOT_TOKEN);
     await CommandService.loadCommands();
+    await client.login(getToken());
 }
 
 finishConnection();
