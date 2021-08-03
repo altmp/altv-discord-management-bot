@@ -1,0 +1,20 @@
+[
+    {
+        "name": "German",
+        "emoji": "🇩🇪",
+        "description": "German",
+        "role": "872191980006965308"
+    },
+    {
+        "name": "English",
+        "emoji": "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+        "description": "English",
+        "role": "872192061850407023" 
+    },
+    {
+        "name": "Swedish",
+        "emoji": "🇸🇪",
+        "description": "Swedish",
+        "role": "872192088861712384"
+    }
+]
