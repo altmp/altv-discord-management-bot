@@ -1,6 +1,8 @@
 import { ICommand } from '../interfaces/ICommand';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as Discord from 'discord.js';
+import getPrefix from '../utility/prefix';
 
 const commands: Array<ICommand> = [];
 
@@ -18,6 +20,18 @@ export default class CommandService {
             commands.push(commandModule.default);
             console.log(`Added Command: ${file}`);
         }
+    }
+
+    /**
+     * Standardized wrong usage reply for commands.
+     * @static
+     * @param {Discord.Message} msg
+     * @param {string} commandName
+     * @memberof CommandService
+     */
+    static sendWrongUsage(msg: Discord.Message, commandName: string): Promise<Discord.Message> {
+        const cmd = CommandService.getCommand(commandName);
+        return msg.reply(`Wrong Usage - ${getPrefix()}${cmd.command}${cmd.description}`);
     }
 
     /**
