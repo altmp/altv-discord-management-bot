@@ -32,11 +32,11 @@ export class DatabaseService {
             throw new Error(`Could not connect to database. Bad URL`);
         }
 
-        const singleDocument = await Database.fetchAllData(COLLECTIONS.GENERAL)[0]
-        if (!singleDocument) {
+        const documents = await Database.fetchAllData<IDatabase>(COLLECTIONS.GENERAL);
+        if (!documents[0]) {
             databaseCache = await Database.insertData({}, COLLECTIONS.GENERAL, true);
         } else {
-            databaseCache = singleDocument;
+            databaseCache = documents[0];
         }
 
         databaseCache._id = databaseCache._id.toString();
