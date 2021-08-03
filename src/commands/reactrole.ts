@@ -4,16 +4,18 @@ import fs from 'fs'
 import path from 'path';
 
 import { ICommand } from '../interfaces/ICommand';
+import { IDatabase } from '../interfaces/IDatabase';
 import { IReactRole } from '../interfaces/IReactRole';
+import { DatabaseService } from '../service/database';
 import { MenuUtility } from '../utility/menu';
 import { MenuOptionsUtility } from '../utility/menu_options';
-
-const reactRole: IReactRole[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/react_role.json')).toString());
 
 const command: ICommand = {
     command: 'reactrole',
     description: 'Shows react role dropdown Menu.',
     execute: async (msg: Discord.Message) => {
+        let reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
+        
         let options: Array<MessageMenuOption> = [];
 
         reactRole.forEach(roles => options.push(

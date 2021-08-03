@@ -13,8 +13,6 @@ import { IReactRole } from './interfaces/IReactRole';
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
 
-const reactRoles: IReactRole[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/react_role.json')).toString());
-
 client.on('ready', async () => {
     console.log('Started Bot');
     guild = client.guilds.cache.first();
@@ -48,9 +46,11 @@ client.on('message', (msg: Discord.Message) => {
 });
 
 client.on('clickMenu', async (menu) => {
+    let reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
+
     await menu.reply.think(true);
 
-    reactRoles.forEach(value => {
+    reactRole.forEach(value => {
         if (menu.values.includes(value.name)) {
             let addrole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
             menu.clicker.member.roles.add(addrole);
