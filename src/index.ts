@@ -6,6 +6,7 @@ import { LoggerService } from './service/logger';
 import getPrefix from './utility/prefix';
 import getToken from './utility/token';
 import DiscordButtons from 'discord-buttons'
+import { IReactRole } from './interfaces/IReactRole';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -40,6 +41,32 @@ client.on('message', (msg: Discord.Message) => {
     }
 
     commandRef.execute(msg, ...args);
+});
+
+client.on('clickMenu', async (menu) => {
+    let reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
+
+    await menu.reply.think(true);
+
+    reactRole.forEach(value => {
+        if (menu.values.includes(value.name)) {
+            let addrole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
+            if (addrole == undefined || addrole == null) {
+                console.warn("Dropdown Role not found! ID: " + value.role);
+                return;
+            }
+            menu.clicker.member.roles.add(addrole);
+        } else {
+            let removerole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
+            if (removerole == undefined || removerole == null) {
+                console.warn("Dropdown Role not found! ID: " + value.role);
+                return;
+            }
+            menu.clicker.member.roles.remove(removerole);
+        }
+    });
+
+    await menu.reply.edit("Roles were updated successfully.");
 });
 
 export function getDiscordUser(id: string): Discord.User {
