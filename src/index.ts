@@ -1,4 +1,6 @@
 import * as Discord from 'discord.js';
+import fs from 'fs'
+import path from 'path';
 
 import CommandService from './service/commands';
 import { DatabaseService } from './service/database';
@@ -6,9 +8,12 @@ import { LoggerService } from './service/logger';
 import getPrefix from './utility/prefix';
 import getToken from './utility/token';
 import DiscordButtons from 'discord-buttons'
+import { IReactRole } from './interfaces/IReactRole';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
+
+const reactRoles: IReactRole[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/react_role.json')).toString());
 
 client.on('ready', async () => {
     console.log('Started Bot');
@@ -40,6 +45,22 @@ client.on('message', (msg: Discord.Message) => {
     }
 
     commandRef.execute(msg, ...args);
+});
+
+client.on('clickMenu', async (menu) => {
+    await menu.reply.think(true);
+
+    reactRoles.forEach(value => {
+        if (menu.values.includes(value.name)) {
+            let addrole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
+            menu.clicker.member.roles.add(addrole);
+        } else {
+            let addrole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
+            menu.clicker.member.roles.remove(addrole);
+        }
+    });
+
+    await menu.reply.edit("I've give you the selected Roles!");
 });
 
 export function getDiscordUser(id: string): Discord.User {
