@@ -1,6 +1,7 @@
 import * as Discord from 'discord.js';
 
 import CommandService from './service/commands';
+import { DatabaseService } from './service/database';
 import getPrefix from './utility/prefix';
 import getToken from './utility/token';
 
@@ -53,6 +54,7 @@ export function getGuild(): Discord.Guild {
 
 async function finishConnection() {
     await CommandService.loadCommands();
+    await DatabaseService.init();
     await client.login(getToken());
 }
 
