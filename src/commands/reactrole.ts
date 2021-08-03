@@ -1,10 +1,7 @@
 import { MessageMenuOption } from 'discord-buttons';
 import * as Discord from 'discord.js';
-import fs from 'fs'
-import path from 'path';
 
 import { ICommand } from '../interfaces/ICommand';
-import { IDatabase } from '../interfaces/IDatabase';
 import { IReactRole } from '../interfaces/IReactRole';
 import { DatabaseService } from '../service/database';
 import { MenuUtility } from '../utility/menu';
@@ -15,7 +12,7 @@ const command: ICommand = {
     description: 'Shows react role dropdown Menu.',
     execute: async (msg: Discord.Message) => {
         let reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
-        
+
         let options: Array<MessageMenuOption> = [];
 
         reactRole.forEach(roles => options.push(

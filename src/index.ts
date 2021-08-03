@@ -1,6 +1,4 @@
 import * as Discord from 'discord.js';
-import fs from 'fs'
-import path from 'path';
 
 import CommandService from './service/commands';
 import { DatabaseService } from './service/database';
