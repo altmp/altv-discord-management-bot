@@ -51,14 +51,22 @@ client.on('clickMenu', async (menu) => {
     reactRole.forEach(value => {
         if (menu.values.includes(value.name)) {
             let addrole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
+            if (addrole == undefined || addrole == null) {
+                console.warn("Dropdown Role not found!");
+                return;
+            }
             menu.clicker.member.roles.add(addrole);
         } else {
-            let addrole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
-            menu.clicker.member.roles.remove(addrole);
+            let removerole = menu.clicker.member.guild.roles.cache.find(role => role.id == value.role);
+            if (removerole == undefined || removerole == null) {
+                console.warn("Dropdown Role not found!");
+                return;
+            }
+            menu.clicker.member.roles.remove(removerole);
         }
     });
 
-    await menu.reply.edit("I've give you the selected Roles!");
+    await menu.reply.edit("Roles were updated successfully.");
 });
 
 export function getDiscordUser(id: string): Discord.User {

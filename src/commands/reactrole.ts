@@ -11,9 +11,9 @@ const command: ICommand = {
     command: 'reactrole',
     description: 'Shows react role dropdown Menu.',
     execute: async (msg: Discord.Message) => {
-        let reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
+        const reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
 
-        let options: Array<MessageMenuOption> = [];
+        const options: Array<MessageMenuOption> = [];
 
         reactRole.forEach(roles => options.push(
             MenuOptionsUtility.generate()
