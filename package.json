@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node ./dist/index.js",
     "clean": "rimraf ./dist",
-    "dev": "nodemon --watch \"./src/**\" --ext \"ts\" --exec \"npm run clean && npm run build && npm run start\""
+    "dev": "nodemon --watch \"./src/**\" --ext \"ts\" --exec \"npm run clean && npm run build && node ./dist/index.js\""
   },
   "author": "",
   "license": "ISC",
