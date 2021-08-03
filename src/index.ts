@@ -51,10 +51,6 @@ client.on('message', (msg: Discord.Message) => {
         return;
     }
 
-    if (msg.content.includes(`@!`)) {
-        return;
-    }
-
     if (!msg.content.startsWith(commandPrefix)) {
         return;
     }
