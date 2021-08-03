@@ -3,13 +3,23 @@ import * as Discord from 'discord.js';
 import { LOG_TYPES } from '../enums/logTypes';
 import { getGuild } from '../index';
 import { ILog } from '../interfaces/ILog';
+import { ILogBinding } from '../interfaces/ILogBinding';
+import generateEmbed from '../utility/embed';
+import { DatabaseService } from './database';
 
-type ChannelTypeBindings = { [key: string]: string };
-
-let channelTypeBindings: ChannelTypeBindings = {};
+let logBindings: Array<ILogBinding> = []
 let commandLogs: Array<ILog> = [];
 
 export class LoggerService {
+    static async init() {
+        const data = await DatabaseService.getData();
+        if (data.logBindings) {
+            logBindings = data.logBindings;
+        } else {
+            logBindings = [];
+        }
+    }
+
     /**
      * Bind a channel id to a log type.
      * All logs for the message of this type get sent to this channel.
@@ -19,7 +29,15 @@ export class LoggerService {
      * @memberof LoggerService
      */
     static setLoggerChannel(channelID: string, type: LOG_TYPES) {
-        channelTypeBindings[type] = channelID;
+        const data: ILogBinding = { type, channel: channelID };
+        const index = logBindings.findIndex(x => x.type === type);
+        if (index >= 0) {
+            logBindings[index] = data;
+        } else {
+            logBindings.push(data);
+        }
+
+        DatabaseService.updateData({ logBindings });
     }
 
     /**
@@ -34,16 +52,21 @@ export class LoggerService {
         commandLogs.push(data);
 
         const guild = getGuild();
-        if (!channelTypeBindings[data.type]) {
-            // 
+
+        const logBinding = logBindings.find(binding => binding.type === data.type);
+
+        if (!logBinding) {
+            console.info(`No Log Binding for Log Type ${data.type}`);
             return;
         }
 
-        const channel = guild.channels.cache.get(channelTypeBindings[data.type]) as Discord.TextChannel;
+        const channel = guild.channels.cache.get(logBinding.channel) as Discord.TextChannel;
         if (!channel) {
-            throw new Error(`Channel: ${channelTypeBindings[data.type]} does not exist.`);
+            console.warn(`Channel: ${logBinding.channel} does not exist.`)
+            return;
         }
 
-        channel.send(data.msg);
+        const embed = generateEmbed(`[${new Date(data.timestamp).toUTCString()}] ${data.type}`, data.msg)
+        channel.send(embed);
     }
 }
