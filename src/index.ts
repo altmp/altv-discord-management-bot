@@ -5,6 +5,7 @@ import { DatabaseService } from './service/database';
 import { LoggerService } from './service/logger';
 import getPrefix from './utility/prefix';
 import getToken from './utility/token';
+import DiscordButtons from 'discord-buttons'
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -54,12 +55,15 @@ export function getGuild(): Discord.Guild {
 }
 
 async function finishConnection() {
+    DiscordButtons(client);
+
     await CommandService.loadCommands();
     await DatabaseService.init();
     
     // Run these After Database Initialization
     await LoggerService.init();
     await client.login(getToken());
+    
 }
 
 finishConnection();
