@@ -9,9 +9,8 @@ const command: ICommand = {
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed(
             'Learn JavaScript',
-            `Unfortunately alt:V is not immediately accessible for new programmers.
-            We think it's great that you are trying to use alt:V but it would be more beneficial if you took some 
-            time to walk through a few basic JavaScript courses which will help you with understanding code syntax.
+            `
+            Unfortunately alt:V is not immediately accessible for new programmers. We think it's great that you are trying to use alt:V but it would be more beneficial if you took some time to walk through a few basic JavaScript courses which will help you with understanding code syntax
 
             Here are some general things you should learn before starting:
             * Learn CommonJS
