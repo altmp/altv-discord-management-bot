@@ -1,4 +1,6 @@
 import { IResponse } from "./IResponse";
+import { LOG_TYPES } from '../enums/logTypes';
+import { ILogBinding } from "./ILogBinding";
 
 /**
  * Default Data Layer for Database
@@ -20,4 +22,11 @@ export interface IDatabase {
      * @memberof IDatabase
      */
     responses?: Array<IResponse>;
+
+    /**
+     * Bound Log Channels
+     * @type {Array<ILogBinding>}
+     * @memberof IDatabase
+     */
+    logBindings?: Array<ILogBinding>;
 }
