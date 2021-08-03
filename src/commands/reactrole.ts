@@ -31,7 +31,7 @@ const command: ICommand = {
 
         options.forEach(option => menu.addOption(option));
 
-        MenuUtility.reply(msg, "** **", menu);
+        MenuUtility.reply(msg, "**React Below to See New Channels**", menu);
         msg.delete();
     }
 }
