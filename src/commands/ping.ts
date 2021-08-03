@@ -1,9 +1,12 @@
 import * as Discord from 'discord.js';
+import { ICommand } from '../interfaces/ICommand';
 
-import { registerCommand } from '../service/commands';
-
-registerCommand({ name: 'ping', command, description: '- Get a response back from the bot.' });
-
-async function command(msg: Discord.Message) {
-    msg.reply('Pong');
+const command: ICommand = {
+    command: 'ping',
+    description: 'Get a response from the server.',
+    execute: async (msg: Discord.Message) => {
+        msg.reply('Pong');
+    }
 }
+
+export default command;

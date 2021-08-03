@@ -2,12 +2,12 @@ import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv';
 
 import { IConfig } from './interfaces/IConfig';
-import { getCommand, propogateCommands } from './service/commands';
 
 import './enums/collections';
+import CommandService from './service/commands';
 
+const PREFIX = '+'
 const config: IConfig = dotenv.config().parsed as IConfig;
-const cwd = require.main.path;
 
 // if (!config.DATABASE_URL) {
 //     throw new Error(`Missing DATABASE_URL from env variables.`);
@@ -29,12 +29,12 @@ if (!config.DISCORD_BOT_TOKEN) {
 //     config.DATABASE_PASSWORD
 // );
 
-// onReady(finishConnection);
-
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
+let guild: Discord.Guild;
 
 client.on('ready', async () => {
-    // Ready Stuff
+    console.log('Started Bot');
+    guild = client.guilds.cache.first();
 });
 
 client.on('message', (msg: Discord.Message) => {
@@ -46,38 +46,44 @@ client.on('message', (msg: Discord.Message) => {
         return;
     }
 
-    if (!msg.content.startsWith('!')) {
+    if (!msg.content.startsWith(PREFIX)) {
         return;
     }
 
     // Parse Command
     const messageContent = msg.content.substring(1);
     if (messageContent.length <= 0) {
-        msg.reply('Not a command.');
         return;
     }
 
     const args = messageContent.split(' ');
     const commandName = args.shift();
-    const commandRef = getCommand(commandName);
+    const commandRef = CommandService.getCommand(commandName);
 
     // Find Command Index
     if (!commandRef) {
-        msg.reply('Did not find that command in my index.');
         return;
     }
 
     // Execute Command with args
-    commandRef.command(msg, ...args);
+    commandRef.execute(msg, ...args);
 });
 
 export function getDiscordUser(id: string): Discord.User {
     return client.users.cache.get(id);
 }
 
+export function getClient(): Discord.Client {
+    return client;
+}
+
+export function getGuild(): Discord.Guild {
+    return guild;
+}
+
 async function finishConnection() {
     client.login(config.DISCORD_BOT_TOKEN);
-    propogateCommands(cwd);
+    await CommandService.loadCommands();
 }
 
 finishConnection();

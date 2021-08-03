@@ -1,45 +1,43 @@
 import { ICommand } from '../interfaces/ICommand';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as Discord from 'discord.js';
 
-const commands: Array<ICommand> = [
-    {
-        name: 'help',
-        command: help,
-        description: '- Stop it. Get some help.',
-    },
-];
+const commands: Array<ICommand> = [];
 
-export function registerCommand(command: ICommand) {
-    if (command.name.includes(' ')) {
-        throw new Error(`Commands cannot contain spaces.`);
+export default class CommandService {
+    /**
+     * Loads all commands from the 'commands' folder.
+     * @static
+     * @memberof CommandService
+     */
+    static async loadCommands(): Promise<void> {
+        const commandsDirectory = path.join(__dirname, '../commands/');
+
+        for (const file of fs.readdirSync(commandsDirectory)) {
+            const commandModule = await import(path.join(commandsDirectory, file));
+            commands.push(commandModule.default);
+            console.log(`Added Command: ${file}`);
+        }
     }
 
-    commands.push(command);
-    console.log(`[BOT] Registered Command ${command.name}`);
-}
-
-export function getCommand(commandName: string): ICommand {
-    return commands.find((cmd) => cmd.name === commandName);
-}
-
-export async function propogateCommands(cwd: string) {
-    const commandsDir = path.join(cwd, 'commands');
-    const files = fs.readdirSync(commandsDir);
-
-    for (let i = 0; i < files.length; i++) {
-        await import(path.join(commandsDir, files[i]));
+    /**
+     * Get a command by command name.
+     * @static
+     * @param {string} commandName
+     * @return {ICommand}
+     * @memberof CommandService
+     */
+    static getCommand(commandName: string): ICommand {
+        return commands.find((cmd) => cmd.command === commandName);
     }
-}
 
-function help(msg: Discord.Message): void {
-    let data = 'Here are some commands... \r\n ```';
-
-    commands.forEach((cmd) => {
-        data += `!${cmd.name} - ${cmd.description} \r\n`;
-    });
-
-    data += '\r\n```';
-    msg.reply(data);
+    /**
+     * Get all commands available.
+     * @static
+     * @return {Array<ICommand>}
+     * @memberof CommandService
+     */
+    static getCommands(): Array<ICommand> {
+        return commands;
+    }
 }
