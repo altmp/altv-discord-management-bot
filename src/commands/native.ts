@@ -4,7 +4,6 @@ import path from 'path';
 
 import { ICommand } from '../interfaces/ICommand';
 import { INative } from '../interfaces/INative';
-import generateEmbed from '../utility/embed';
 
 const natives: INative[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/natives.json')).toString());
 

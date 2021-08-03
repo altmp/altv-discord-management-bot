@@ -7,7 +7,7 @@ export default class RegexUtility {
      * @memberof RegexUtility
      */
     static parseUserID(id: string): string {
-        const idRegex = /<@(\d+)>/g;
+        const idRegex = /<@!?(\d+)>/g;
         const idRegexResult = idRegex.exec(id);
         return idRegexResult ? idRegexResult[1] : id;
     }
