@@ -4,6 +4,7 @@ import path from 'path';
 
 import { ICommand } from '../interfaces/ICommand';
 import { INative } from '../interfaces/INative';
+import RegexUtility from '../utility/regex';
 
 const natives: INative[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/natives.json')).toString());
 
@@ -20,10 +21,17 @@ const command: ICommand = {
 
         const paramsFormatted = native.params ? native.params.map(param => `${param.name}: ${param.type}`).join(', '): '';
         const resultFormatted = Array.isArray(native.result) ? `[` + native.result.join(', ') + `]` : native.result;
+        const commentLines = native.comment.split('\n');
+
+        let commentFormatted = native.comment;
+        if (commentLines.length > 10) {
+            commentFormatted = commentLines.slice(0, 10).join('\n');
+            commentFormatted += `...\n\n[Read more](https://natives.altv.mp/#/${native.hash})`
+        }
 
         const embed = new Discord.MessageEmbed({
             title: native.name,
-            description: `\`\`\`ts\nfunction ${native.name}(${paramsFormatted}): ${resultFormatted}\n\`\`\`\n${native.comment}`,
+            description: `\`\`\`ts\nfunction ${native.name}(${paramsFormatted}): ${resultFormatted}\n\`\`\`\n${commentFormatted}`,
             color: '#008736',
             footer: {
                 text: `${native.hash} | Build: ${native.build}`,
