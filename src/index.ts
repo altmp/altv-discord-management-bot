@@ -2,12 +2,21 @@ import * as Discord from 'discord.js';
 import * as dotenv from 'dotenv';
 
 import { IConfig } from './interfaces/IConfig';
-
-import './enums/collections';
 import CommandService from './service/commands';
 
-const PREFIX = '+'
+import './enums/collections';
+
 const config: IConfig = dotenv.config().parsed as IConfig;
+
+let commandPrefix;
+
+if (config.PREFIX) {
+    commandPrefix = config.PREFIX;
+} else if (process.env.PREFIX) {
+    commandPrefix = process.env.PREFIX;
+} else {
+    commandPrefix = '+'
+}
 
 // if (!config.DATABASE_URL) {
 //     throw new Error(`Missing DATABASE_URL from env variables.`);
@@ -46,7 +55,7 @@ client.on('message', (msg: Discord.Message) => {
         return;
     }
 
-    if (!msg.content.startsWith(PREFIX)) {
+    if (!msg.content.startsWith(commandPrefix)) {
         return;
     }
 

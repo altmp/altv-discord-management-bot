@@ -12,6 +12,7 @@ This uses environment variables. You either use a `.env` file or pass environmen
 DATABASE_URL=''
 DATABASE_NAME=''
 DISCORD_BOT_TOKEN=''
+PREFIX=''
 ```
 
 Make sure when you make a discord bot that you turn on all **user intent options in developer settings.**
