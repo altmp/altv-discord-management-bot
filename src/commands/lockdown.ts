@@ -15,8 +15,8 @@ const command: ICommand = {
         }
 
         if (channel.permissionsFor(msg.guild.roles.everyone).has('SEND_MESSAGES')) {
-            await channel.send("🔒 **LOCKED** 🔒");
-            if (channel != msg.channel) msg.channel.send("🔒 **LOCKED** 🔒");
+            await channel.send("🔒 **LOCKED** 🔒")
+            if (channel != msg.channel) msg.channel.send(`🔒 **<#${channel.id}> LOCKED** 🔒`);
             setTimeout(() => {
                 channel.updateOverwrite(msg.guild.roles.everyone,{'SEND_MESSAGES': false});
             }, 50);
@@ -24,7 +24,7 @@ const command: ICommand = {
             await channel.updateOverwrite(msg.guild.roles.everyone,{'SEND_MESSAGES': true});
             setTimeout(() => {
                 channel.send("🔓 **UNLOCKED** 🔓");
-                if (channel != msg.channel) msg.channel.send("🔓 **UNLOCKED** 🔓");
+                if (channel != msg.channel) msg.channel.send(`🔓 **<#${channel.id}> UNLOCKED** 🔓`);
             }, 50);
         }
     }
