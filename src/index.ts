@@ -10,6 +10,7 @@ import { IReactRole } from './interfaces/IReactRole';
 import { ILockdown } from './interfaces/ILockdown';
 import PermissionService from './service/permissions';
 import { checkLockdownChannel } from './commands/lockdown';
+import { IMutedUser } from './interfaces/IMutedUser';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -51,6 +52,16 @@ client.on('message', (msg: Discord.Message) => {
     }
 
     commandRef.execute(msg, ...args);
+});
+
+client.on('guildMemberAdd', async (member) => { 
+    const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
+    const search: IMutedUser = mutedUser.find(x => x.userId == member.id);
+
+    if (search) {
+        const mutedRole = getGuild().roles.cache.get("872509058198949909");
+        member.roles.add(mutedRole);
+    }
 });
 
 client.on('clickMenu', async (menu) => {
