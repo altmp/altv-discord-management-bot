@@ -1,6 +1,9 @@
 import * as Discord from 'discord.js';
 
 import { ICommand } from '../interfaces/ICommand';
+import { IDatabase } from '../interfaces/IDatabase';
+import { ILockdown } from '../interfaces/ILockdown';
+import { DatabaseService } from '../service/database';
 import RegexUtility from '../utility/regex';
 
 
@@ -12,6 +15,22 @@ const command: ICommand = {
         if (channel == undefined || channel == null) {
             msg.channel.send("Please provide a valid Channel ID");
             return;
+        }
+
+        const lockdownChannel: ILockdown[] = (await DatabaseService.getData()).lockdownChannel;
+        const search: ILockdown = lockdownChannel.find(x => x.channelId == channel.id);
+
+        if (minutes != undefined || minutes != null) {
+            if (!search) {
+                lockdownChannel.push({ channelId: channel.id, locked: Date.now(), until: Date.now() + (minutes * 60000) });
+                await DatabaseService.updateData({ lockdownChannel });
+            }   
+        }
+        
+        if (search) {
+            const index: number = lockdownChannel.indexOf(search);
+            lockdownChannel.splice(index, 1);
+            await DatabaseService.updateData({ lockdownChannel });
         }
 
         if (channel.permissionsFor(msg.guild.roles.everyone).has('SEND_MESSAGES')) {
