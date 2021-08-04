@@ -44,6 +44,7 @@ client.on('message', (msg: Discord.Message) => {
 });
 
 client.on('clickMenu', async (menu) => {
+    if (menu.id != 'RoleSelect') return;
     let reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
 
     await menu.reply.think(true);
