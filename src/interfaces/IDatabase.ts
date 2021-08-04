@@ -34,9 +34,6 @@ export interface IDatabase {
     logBindings?: Array<ILogBinding>;
 
     /**
-<<<<<<< HEAD
-     * React Roles
-=======
      * List of commands with specific roles bound to them.
      * @type {Array<ICommandBinding>}
      * @memberof IDatabase
@@ -45,7 +42,6 @@ export interface IDatabase {
 
     /**
      * Reaction Roles
->>>>>>> 69d14f1aa83761a34e99456abb5e8569f2b72241
      * @type {Array<IReactRole>}
      * @memberof IDatabase
      */
