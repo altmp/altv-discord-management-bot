@@ -2,6 +2,7 @@ import { IResponse } from "./IResponse";
 import { LOG_TYPES } from '../enums/logTypes';
 import { ILogBinding } from "./ILogBinding";
 import { IReactRole } from "./IReactRole";
+import { ICommandBinding } from "./ICommandBinding";
 
 /**
  * Default Data Layer for Database
@@ -32,7 +33,18 @@ export interface IDatabase {
     logBindings?: Array<ILogBinding>;
 
     /**
+<<<<<<< HEAD
      * React Roles
+=======
+     * List of commands with specific roles bound to them.
+     * @type {Array<ICommandBinding>}
+     * @memberof IDatabase
+     */
+    commandBindings?: Array<ICommandBinding>
+
+    /**
+     * Reaction Roles
+>>>>>>> 69d14f1aa83761a34e99456abb5e8569f2b72241
      * @type {Array<IReactRole>}
      * @memberof IDatabase
      */

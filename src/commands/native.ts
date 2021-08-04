@@ -11,6 +11,7 @@ const natives: INative[] = JSON.parse(fs.readFileSync(path.join(__dirname, '../.
 const command: ICommand = {
     command: 'native',
     description: 'Native a player from the server.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, hash: string) => {
         const native: INative | undefined = natives.find(native => native.name.toLowerCase() == hash.toLowerCase() || native.hash.toLowerCase() == hash.toLowerCase())
 
