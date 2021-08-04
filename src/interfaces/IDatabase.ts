@@ -4,6 +4,7 @@ import { ILogBinding } from "./ILogBinding";
 import { IReactRole } from "./IReactRole";
 import { ILockdown } from "./ILockdown";
 import { ICommandBinding } from "./ICommandBinding";
+import { IMutedUser } from "./IMutedUser";
 
 /**
  * Default Data Layer for Database
@@ -53,4 +54,11 @@ export interface IDatabase {
      * @memberof IDatabase
      */
     lockdownChannel?: Array<ILockdown>;
+
+    /**
+     * Muted User
+     * @type {Array<IMutedUser>}
+     * @memberof IDatabase
+     */
+    mutedUser?: Array<IMutedUser>;
 }
