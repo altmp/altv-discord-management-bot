@@ -22,7 +22,7 @@ const command: ICommand = {
 
         if (minutes != undefined || minutes != null) {
             if (!search) {
-                lockdownChannel.push({ channelId: channel.id, locked: Date.now(), until: Date.now() + (minutes * 60000) });
+                lockdownChannel.push({ channelId: channel.id, until: Date.now() + (minutes * 60000) });
                 await DatabaseService.updateData({ lockdownChannel });
             }   
         }
