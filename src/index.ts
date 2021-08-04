@@ -9,6 +9,7 @@ import DiscordButtons from 'discord-buttons'
 import { IReactRole } from './interfaces/IReactRole';
 import { ILockdown } from './interfaces/ILockdown';
 import PermissionService from './service/permissions';
+import { checkLockdownChannel } from './commands/lockdown';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -83,27 +84,6 @@ function handleTick() {
     setInterval(async () => {
         await checkLockdownChannel();
     }, 1000);
-}
-
-async function checkLockdownChannel() {
-    let lockdownChannel: ILockdown[] = (await DatabaseService.getData()).lockdownChannel;
-
-    await lockdownChannel.forEach(async (lockDownData) => {
-        if (Date.now() > lockDownData.until) {
-            const channel = client.channels.cache.get(lockDownData.channelId) as Discord.TextChannel;
-            const role = client.guilds.cache.get("872092708527833139").roles.everyone;
-            if (!channel.permissionsFor(role).has('SEND_MESSAGES')) {
-                await channel.updateOverwrite(role,{'SEND_MESSAGES': true});
-                setTimeout(() => {
-                    channel.send("🔓 **UNLOCKED** 🔓");
-                }, 50);
-            }
-            const index = lockdownChannel.indexOf(lockDownData);
-            lockdownChannel.splice(index, 1);
-        }
-    });
-
-    await DatabaseService.updateData({ lockdownChannel });
 }
 
 export function getDiscordUser(id: string): Discord.User {
