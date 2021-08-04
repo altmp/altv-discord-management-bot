@@ -46,7 +46,7 @@ const command: ICommand = {
                 channel.updateOverwrite(msg.guild.roles.everyone,{'SEND_MESSAGES': false});
             }, 50);
         } else {
-            await channel.updateOverwrite(msg.guild.roles.everyone,{'SEND_MESSAGES': true});
+            await channel.updateOverwrite(msg.guild.roles.everyone,{'SEND_MESSAGES': null});
             setTimeout(() => {
                 channel.send("🔓 **UNLOCKED** 🔓");
                 if (channel != msg.channel) msg.channel.send(`🔓 **<#${channel.id}> UNLOCKED** 🔓`);
@@ -64,7 +64,7 @@ export async function checkLockdownChannel() {
             const role = guild.roles.everyone;
             const channel = guild.channels.cache.get(lockDownData.channelId) as Discord.TextChannel;
             if (!channel.permissionsFor(role).has('SEND_MESSAGES')) {
-                await channel.updateOverwrite(role,{'SEND_MESSAGES': true});
+                await channel.updateOverwrite(role,{'SEND_MESSAGES': null});
                 setTimeout(() => {
                     channel.send("🔓 **UNLOCKED** 🔓");
                 }, 50);
