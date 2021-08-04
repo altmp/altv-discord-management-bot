@@ -1,4 +1,5 @@
 import * as Discord from 'discord.js';
+import ms from 'ms';
 import { LOG_TYPES } from '../enums/logTypes';
 
 import { ICommand } from '../interfaces/ICommand';
@@ -11,7 +12,7 @@ const command: ICommand = {
     command: 'mute',
     description: '<user | id> [minutes] [reason] - Kick a player from the server.',
     skipPermissionCheck: true,
-    execute: async (msg: Discord.Message, user: string, minutes: number, ...reason) => {
+    execute: async (msg: Discord.Message, user: string, time: string, ...reason) => {
         const userID = RegexUtility.parseUserID(user);
         const guildMember = msg.guild.members.cache.get(userID);
 
@@ -44,7 +45,7 @@ const command: ICommand = {
 
             const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
 
-            mutedUser.push({ userId: guildMember.id, userName: guildMember.user.username, mutedById: msg.author.id, mutedByName: msg.author.username, until: minutes ? Date.now() + (minutes * 6000) : null, reason: reason ? reason.join(' ') : null });
+            mutedUser.push({ userId: guildMember.id, userName: guildMember.user.username, mutedById: msg.author.id, mutedByName: msg.author.username, until: time ? Date.now() + ms(time) : null, reason: reason ? reason.join(' ') : null });
             await DatabaseService.updateData({ mutedUser });
 
             msg.channel.send(`Muted <@${userID}>`);
