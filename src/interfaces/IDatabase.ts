@@ -2,6 +2,7 @@ import { IResponse } from "./IResponse";
 import { LOG_TYPES } from '../enums/logTypes';
 import { ILogBinding } from "./ILogBinding";
 import { IReactRole } from "./IReactRole";
+import { ILockdown } from "./ILockdown";
 import { ICommandBinding } from "./ICommandBinding";
 
 /**
@@ -49,4 +50,11 @@ export interface IDatabase {
      * @memberof IDatabase
      */
     reactRoles?: Array<IReactRole>;
+
+    /**
+     * Lockdown Cahnnel
+     * @type {Array<ILockdown>}
+     * @memberof IDatabase
+     */
+    lockdownChannel?: Array<ILockdown>;
 }

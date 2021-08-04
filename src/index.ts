@@ -8,6 +8,7 @@ import getToken from './utility/token';
 import DiscordButtons from 'discord-buttons'
 import { IReactRole } from './interfaces/IReactRole';
 import PermissionService from './service/permissions';
+import { checkLockdownChannel } from './commands/lockdown';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -52,6 +53,7 @@ client.on('message', (msg: Discord.Message) => {
 });
 
 client.on('clickMenu', async (menu) => {
+    if (menu.id != 'RoleSelect') return;
     let reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
 
     await menu.reply.think(true);
@@ -77,6 +79,12 @@ client.on('clickMenu', async (menu) => {
     await menu.reply.edit("Roles were updated successfully.");
 });
 
+function handleTick() {
+    setInterval(async () => {
+        await checkLockdownChannel();
+    }, 1000);
+}
+
 export function getDiscordUser(id: string): Discord.User {
     return client.users.cache.get(id);
 }
@@ -99,6 +107,7 @@ async function finishConnection() {
     await LoggerService.init();
     await PermissionService.init();
     await client.login(getToken());
+    handleTick();
     
 }
 
