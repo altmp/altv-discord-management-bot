@@ -3,6 +3,6 @@ export interface IMutedUser {
     userId: string;
     mutedByName: string;
     mutedById: string;
-    reason?: number;
+    reason?: string;
     until?: number;
 }
