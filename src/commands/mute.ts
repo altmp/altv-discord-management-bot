@@ -1,5 +1,6 @@
 import * as Discord from 'discord.js';
 import ms from 'ms';
+import { getGuild } from '..';
 import { LOG_TYPES } from '../enums/logTypes';
 
 import { ICommand } from '../interfaces/ICommand';
@@ -51,6 +52,25 @@ const command: ICommand = {
             msg.channel.send(`Muted <@${userID}>`);
         }
     }
+}
+
+export async function checkMutedUser() {
+    let mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
+
+    mutedUser.forEach((mutedUserData) => {
+        if (mutedUserData.until != null && Date.now() > mutedUserData.until) {
+            const user = getGuild().members.cache.find(x => x.id == mutedUserData.userId);
+            const mutedRole = getGuild().roles.cache.get("872509058198949909");
+            if (user != null && user != undefined) {
+                user.roles.remove(mutedRole);
+            }
+
+            const index: number = mutedUser.indexOf(mutedUserData);
+            mutedUser.splice(index, 1);
+        }
+    });
+
+    await DatabaseService.updateData({ mutedUser });
 }
 
 export default command;

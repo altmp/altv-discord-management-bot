@@ -7,9 +7,9 @@ import getPrefix from './utility/prefix';
 import getToken from './utility/token';
 import DiscordButtons from 'discord-buttons'
 import { IReactRole } from './interfaces/IReactRole';
-import { ILockdown } from './interfaces/ILockdown';
 import PermissionService from './service/permissions';
 import { checkLockdownChannel } from './commands/lockdown';
+import { checkMutedUser } from './commands/mute';
 import { IMutedUser } from './interfaces/IMutedUser';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
@@ -94,6 +94,7 @@ client.on('clickMenu', async (menu) => {
 function handleTick() {
     setInterval(async () => {
         await checkLockdownChannel();
+        await checkMutedUser();
     }, 1000);
 }
 
