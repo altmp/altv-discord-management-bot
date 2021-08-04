@@ -10,6 +10,7 @@ import { MenuOptionsUtility } from '../utility/menu_options';
 const command: ICommand = {
     command: 'reactrole',
     description: 'Shows react role dropdown Menu.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const reactRole: IReactRole[] = (await DatabaseService.getData()).reactRoles;
 
@@ -20,7 +21,7 @@ const command: ICommand = {
                 .setLabel(roles.name)
                 .setValue(roles.name)
                 .setEmoji(roles.emoji)
-                .setDescription(roles.description)
+                .setDescription(roles.description ? roles.description : roles.name)
                 ));
 
         const menu = MenuUtility.generate()
