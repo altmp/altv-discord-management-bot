@@ -6,6 +6,7 @@ import { ICommand } from '../interfaces/ICommand';
 const command: ICommand = {
     command: 'learnjs',
     description: 'Embed links to help with learning JS.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed(
             'Learn JavaScript',

@@ -6,6 +6,7 @@ import { ICommand } from '../interfaces/ICommand';
 const command: ICommand = {
     command: 'search',
     description: 'Embed telling someone to search Discord.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed(
             'Searching Discord',
