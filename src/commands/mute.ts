@@ -9,9 +9,9 @@ import RegexUtility from '../utility/regex';
 
 const command: ICommand = {
     command: 'mute',
-    description: '<user> [minutes] [reason] - Kick a player from the server.',
+    description: '<user | id> [minutes] [reason] - Kick a player from the server.',
     skipPermissionCheck: true,
-    execute: async (msg: Discord.Message, user: string, minutes: number, reason: string) => {
+    execute: async (msg: Discord.Message, user: string, minutes: number, ...reason) => {
         const userID = RegexUtility.parseUserID(user);
         const guildMember = msg.guild.members.cache.get(userID);
 
@@ -38,13 +38,16 @@ const command: ICommand = {
                 mutedUser.splice(index, 1);
                 await DatabaseService.updateData({ mutedUser });
             }
+            msg.channel.send(`Unmuted <@${userID}>`);
         } else {
             guildMember.roles.add(mutedRole);
 
             const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
 
-            mutedUser.push({ userId: guildMember.id, userName: guildMember.user.username, mutedById: msg.author.id, mutedByName: msg.author.username });
+            mutedUser.push({ userId: guildMember.id, userName: guildMember.user.username, mutedById: msg.author.id, mutedByName: msg.author.username, until: minutes ? Date.now() + (minutes * 6000) : null, reason: reason ? reason.join(' ') : null });
             await DatabaseService.updateData({ mutedUser });
+
+            msg.channel.send(`Muted <@${userID}>`);
         }
     }
 }
