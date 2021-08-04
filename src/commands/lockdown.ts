@@ -1,7 +1,6 @@
 import * as Discord from 'discord.js';
 
 import { ICommand } from '../interfaces/ICommand';
-import { IDatabase } from '../interfaces/IDatabase';
 import { ILockdown } from '../interfaces/ILockdown';
 import { DatabaseService } from '../service/database';
 import RegexUtility from '../utility/regex';
@@ -9,7 +8,7 @@ import RegexUtility from '../utility/regex';
 
 const command: ICommand = {
     command: 'lockdown',
-    description: '<user> - Kick a player from the server.',
+    description: '<channel> <minutes> - Locks a Channel.',
     execute: async (msg: Discord.Message, id: string, minutes: number) => {
         const channel = msg.guild.channels.cache.find(ch => ch.id == id || ch.id == RegexUtility.parseChannelID(id)) as Discord.TextChannel;
         if (channel == undefined || channel == null) {
