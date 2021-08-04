@@ -34,8 +34,13 @@ const command: ICommand = {
         }
 
         if (channel.permissionsFor(msg.guild.roles.everyone).has('SEND_MESSAGES')) {
-            await channel.send("🔒 **LOCKED** 🔒")
-            if (channel != msg.channel) msg.channel.send(`🔒 **<#${channel.id}> LOCKED** 🔒`);
+            if (minutes != undefined || minutes != null) {
+                await channel.send(`🔒 **LOCKED FOR ${minutes} MINUTES** 🔒`)
+                if (channel != msg.channel) msg.channel.send(`🔒 **<#${channel.id}> LOCKED FOR ${minutes} MINUTES** 🔒`);
+            } else {
+                await channel.send("🔒 **LOCKED** 🔒")
+                if (channel != msg.channel) msg.channel.send(`🔒 **<#${channel.id}> LOCKED** 🔒`);
+            }
             setTimeout(() => {
                 channel.updateOverwrite(msg.guild.roles.everyone,{'SEND_MESSAGES': false});
             }, 50);
