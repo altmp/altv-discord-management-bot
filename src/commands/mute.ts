@@ -41,6 +41,7 @@ const command: ICommand = {
                 await DatabaseService.updateData({ mutedUser });
             }
             msg.channel.send(`Unmuted <@${userID}>`);
+            //TODO: Log
         } else {
             guildMember.roles.add(mutedRole);
 
@@ -50,6 +51,7 @@ const command: ICommand = {
             await DatabaseService.updateData({ mutedUser });
 
             msg.channel.send(`Muted <@${userID}>`);
+            //TODO: Log
         }
     }
 }
@@ -67,6 +69,7 @@ export async function checkMutedUser() {
 
             const index: number = mutedUser.indexOf(mutedUserData);
             mutedUser.splice(index, 1);
+            //TODO: Log
         }
     });
 
