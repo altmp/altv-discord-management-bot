@@ -25,7 +25,7 @@ const command: ICommand = {
             const lockedChannelMessage = time ? `🔒 **LOCKED FOR ${ms(ms(time), { long: true})}** 🔒` : "🔒 **LOCKED** 🔒";
             const lockedChannelMessage2 = time ? `🔒 **<#${channel.id}> LOCKED FOR ${ms(ms(time), { long: true})}** 🔒` : `🔒 **<#${channel.id}> LOCKED** 🔒`;
 
-            channel.send(lockedChannelMessage);
+            await channel.send(lockedChannelMessage);
             if (channel != msg.channel) msg.channel.send(lockedChannelMessage2);
             setTimeout(() => {
                 channel.updateOverwrite(msg.guild.roles.everyone,{'SEND_MESSAGES': false});
