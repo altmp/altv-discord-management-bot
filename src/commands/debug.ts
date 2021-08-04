@@ -6,6 +6,7 @@ import { ICommand } from '../interfaces/ICommand';
 const command: ICommand = {
     command: 'debug',
     description: 'Embed which explains how to enable debug mode.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed('We Support Reconnect in Debug Mode Only');
         embed.addField(

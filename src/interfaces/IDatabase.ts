@@ -3,6 +3,7 @@ import { LOG_TYPES } from '../enums/logTypes';
 import { ILogBinding } from "./ILogBinding";
 import { IReactRole } from "./IReactRole";
 import { ILockdown } from "./ILockdown";
+import { ICommandBinding } from "./ICommandBinding";
 
 /**
  * Default Data Layer for Database
@@ -33,7 +34,14 @@ export interface IDatabase {
     logBindings?: Array<ILogBinding>;
 
     /**
-     * React Roles
+     * List of commands with specific roles bound to them.
+     * @type {Array<ICommandBinding>}
+     * @memberof IDatabase
+     */
+    commandBindings?: Array<ICommandBinding>
+
+    /**
+     * Reaction Roles
      * @type {Array<IReactRole>}
      * @memberof IDatabase
      */

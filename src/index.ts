@@ -8,6 +8,7 @@ import getToken from './utility/token';
 import DiscordButtons from 'discord-buttons'
 import { IReactRole } from './interfaces/IReactRole';
 import { ILockdown } from './interfaces/ILockdown';
+import PermissionService from './service/permissions';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -39,6 +40,13 @@ client.on('message', (msg: Discord.Message) => {
     // Find Command Index
     if (!commandRef) {
         return;
+    }
+
+    // Check Permission
+    if (!commandRef.skipPermissionCheck) {
+        if (!PermissionService.checkPermission(msg.author, commandRef.command)) {
+            return;
+        }
     }
 
     commandRef.execute(msg, ...args);
@@ -118,6 +126,7 @@ async function finishConnection() {
     
     // Run these After Database Initialization
     await LoggerService.init();
+    await PermissionService.init();
     await client.login(getToken());
     handleTick();
     
