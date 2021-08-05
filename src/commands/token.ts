@@ -6,6 +6,7 @@ import { ICommand } from '../interfaces/ICommand';
 const command: ICommand = {
     command: 'token',
     description: 'Embed which explains how to get a master list token.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed(
             'Need a Master List Token?',
