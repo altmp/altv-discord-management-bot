@@ -1,11 +1,7 @@
 import * as Discord from 'discord.js';
 import ms from 'ms';
-import { config, getGuild } from '..';
 import { LOG_TYPES } from '../enums/logTypes';
-
 import { ICommand } from '../interfaces/ICommand';
-import { IMutedUser } from '../interfaces/IMutedUser';
-import { DatabaseService } from '../service/database';
 import { LoggerService } from '../service/logger';
 import MuteService from '../service/mutes';
 import generateEmbed from '../utility/embed';
@@ -14,80 +10,40 @@ import RegexUtility from '../utility/regex';
 const command: ICommand = {
     command: 'mute',
     description: '<user | id> [minutes] [reason] - Kick a player from the server.',
-    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, user: string, time: string, ...reason: string[]) => {
-        if (time == "Forever") time = null;
+        if (time == "Forever") {
+            time = null;
+        }
+
         const userID = RegexUtility.parseUserID(user);
         const guildMember = msg.guild.members.cache.get(userID);
-        const mutedUser: IMutedUser[] = MuteService.getAll();
 
         if (!guildMember) {
-            msg.reply(`${userID} does not exist.`);
+            msg.reply(`${userID} does not exist in this guild.`);
             return;
         }
 
-        const mutedRole = msg.guild.roles.cache.get(config.muteRole);
-
-        if (!mutedRole) {
-            msg.reply(`Role does not exist.`);
+        // Mute for 5 Years if 'null'.
+        const actualTime = time ? Date.now() + ms(time) : Date.now() + 1000 * 60 * 60 * 24 * 365 * 5;
+        const result = await MuteService.add(guildMember.id, msg.member.id, parseInt(actualTime), reason.length ? reason.join(' ') : null);
+        if (!result) {
+            msg.reply(`Could not mute <@!${guildMember.id}>. Was the mute role set?`);
             return;
         }
 
-        if (guildMember.roles.cache.has(config.muteRole)) {
-            guildMember.roles.remove(mutedRole);
-            
-            const search: IMutedUser = MuteService.get(guildMember.id);
-
-            if (search) {
-                MuteService.remove(guildMember.id);
-            }
-            msg.channel.send(`Unmuted <@${userID}>`);
-            LoggerService.logMessage({
-                type: LOG_TYPES.COMMANDS,
-                msg: `<@!${guildMember.id}> got unmuted by <@!${msg.author.id}>!\nUnmuted User ID: ${guildMember.id}, Unmuted By ID: ${msg.author.id}`
-            });
-        } else {
-            guildMember.roles.add(mutedRole);
-
-            MuteService.add(guildMember.id, msg.author.id, time ? Date.now() + ms(time) : null, reason.length ? reason.join(' ') : null);
-
-            const embed = generateEmbed(
-                "Mute", 
-                `<@!${guildMember.id}> has been muted!`
-            );
-            embed.addField("Until", time ? new Date(Date.now() + ms(time)) : 'Forever');
-            embed.addField("Reason", reason.length ? reason.join(' ') : 'Not given');
-            embed.setFooter(`Muted User ID: ${guildMember.id}, Muted By ID: ${msg.author.id}`);
-
-            msg.channel.send(`** **`, embed);
-            LoggerService.logMessage({
-                type: LOG_TYPES.COMMANDS,
-                msg: `<@!${guildMember.id}> got muted by <@!${msg.author.id}>!\nMuted User ID: ${guildMember.id}, Muted By ID: ${msg.author.id}`
-            });
-        }
-
-        msg.delete();
+        const embed = generateEmbed(
+            "Mute", 
+            `<@!${guildMember.id}> has been muted!`
+        );
+        embed.addField("Until", new Date(actualTime));
+        embed.addField("Reason", reason.length ? reason.join(' ') : 'Not given');
+        embed.setFooter(`Muted By ${msg.author.username}#${msg.author.discriminator}`);
+        msg.channel.send(embed);
+        LoggerService.logMessage({
+            type: LOG_TYPES.COMMANDS,
+            msg: `<@!${guildMember.id}> got muted by <@!${msg.author.id}>!\nMuted User ID: ${guildMember.id}, Muted By ID: ${msg.author.id}`
+        });
     }
-}
-
-export async function checkMutedUser() {
-    let mutedUser: IMutedUser[] = MuteService.getAll();
-
-    mutedUser.forEach((mutedUserData) => {
-        if (mutedUserData.until != null && Date.now() > mutedUserData.until) {
-            const user = getGuild().members.cache.get(mutedUserData.userId);
-            const mutedRole = getGuild().roles.cache.get(config.muteRole);
-            if (user != null && user != undefined) {
-                user.roles.remove(mutedRole);
-            }
-
-            MuteService.remove(mutedUserData.userId);
-            LoggerService.logMessage({
-                type: LOG_TYPES.MODERATOR,
-                msg: `<@!${user.user.id}> got automatically umuted!\nUnmuted User ID: ${user.user.id}`,
-            });
-        }
-    });
 }
 
 export default command;

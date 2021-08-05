@@ -9,7 +9,6 @@ import DiscordButtons from 'discord-buttons'
 import { IReactRole } from './interfaces/IReactRole';
 import PermissionService from './service/permissions';
 import { checkLockdownChannel } from './commands/lockdown';
-import { checkMutedUser } from './commands/mute';
 import { IMutedUser } from './interfaces/IMutedUser';
 import MuteService from './service/mutes';
 import { LOG_TYPES } from './enums/logTypes';
@@ -59,13 +58,7 @@ client.on('message', (msg: Discord.Message) => {
 });
 
 client.on('guildMemberAdd', async (member) => { 
-    const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
-    const search: IMutedUser = mutedUser.find(x => x.userId == member.id);
-
-    if (search) {
-        const mutedRole = getGuild().roles.cache.get("872509058198949909");
-        member.roles.add(mutedRole);
-    }
+    MuteService.checkNewUser(member.id);
 });
 
 client.on('clickMenu', async (menu) => {
@@ -105,8 +98,8 @@ client.on('messageDelete', (message: Discord.Message | Discord.PartialMessage) =
 function handleTick() {
     setInterval(async () => {
         await checkLockdownChannel();
-        await checkMutedUser();
-    }, 1000);
+        await MuteService.tick();
+    }, 2500);
 }
 
 export function getDiscordUser(id: string): Discord.User {

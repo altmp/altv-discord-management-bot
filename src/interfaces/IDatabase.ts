@@ -68,5 +68,12 @@ export interface IDatabase {
      * @type {Array<IMutedUser>}
      * @memberof IDatabase
      */
-    mutedUser?: Array<IMutedUser>;
+    mutedUsers?: Array<IMutedUser>;
+
+    /**
+     * Role for Muted Users
+     * @type {string}
+     * @memberof IDatabase
+     */
+    mutedRole?: string;
 }

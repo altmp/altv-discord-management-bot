@@ -1,11 +1,11 @@
-import * as Discord from 'discord.js';
+import { LOG_TYPES } from '../enums/logTypes';
 import { getGuild } from '../index';
-import { ICommandBinding } from '../interfaces/ICommandBinding';
 import { IMutedUser } from '../interfaces/IMutedUser';
-import CommandService from "./commands";
 import { DatabaseService } from './database';
+import { LoggerService } from './logger';
 
-let mutedUser: Array<IMutedUser> = [];
+let mutedUsers: Array<IMutedUser> = [];
+let mutedRole: string;
 
 export default class MuteService {
     /**
@@ -15,13 +15,37 @@ export default class MuteService {
      */
     static async init() {
         const data = await DatabaseService.getData();
-        if (data.mutedUser) {
-            mutedUser = data.mutedUser;
-        } else {
-            mutedUser = [];
-        }
+
+        mutedUsers = data.mutedUsers ? data.mutedUsers : [];
+        mutedRole = data.mutedRole ? data.mutedRole : null;
 
         console.log(`Initialized - Mute Service`);
+    }
+
+    /**
+     * Verify that the role is appended to a user on join if they should be muted.
+     * @static
+     * @param {string} userID
+     * @memberof MuteService
+     */
+    static checkNewUser(userID: string): void {
+        const guild = getGuild();
+        const index = mutedUsers.findIndex(x => x.userId == userID);
+    
+        if (index <= -1) {
+            return;
+        }
+
+        const guildMember = guild.members.cache.get(userID);
+        if (!guildMember) {
+            return;
+        }
+
+        if (guildMember.roles.cache.has(mutedRole)) {
+            return;
+        }
+
+        guildMember.roles.add(mutedRole);
     }
 
     /**
@@ -35,12 +59,29 @@ export default class MuteService {
      * @memberof MuteService
      */
     static async add(userId: string, mutedById: string, until: number | null, reason: string | null): Promise<boolean> {
-        let index = mutedUser.findIndex(user => user.userId === userId);
-        if (index <= -1) {
-            mutedUser.push({ userId: userId, mutedById: mutedById, until: until, reason: reason });
+        const guild = getGuild();
+        const guildMember = guild.members.cache.get(userId);
+
+        if (!guildMember) {
+            return false;
         }
 
-        return await DatabaseService.updateData({ mutedUser });
+        if (!mutedRole) {
+            return false;
+        }
+
+        if (!guildMember.roles.cache.has(mutedRole)) {
+            await guildMember.roles.add(mutedRole);
+        }
+
+        let index = mutedUsers.findIndex(user => user.userId === userId);
+        if (index <= -1) {
+            mutedUsers.push({ userId: userId, mutedById: mutedById, until: until, reason: reason });
+        } else {
+            mutedUsers[index] = { userId: userId, mutedById: mutedById, until: until, reason: reason };
+        }
+
+        return await DatabaseService.updateData({ mutedUsers });
     }
 
     /**
@@ -50,15 +91,55 @@ export default class MuteService {
      * @return {*}  {Promise<boolean>}
      * @memberof MuteService
      */
-    static async remove(userId: string): Promise<boolean> {
-        const index = mutedUser.findIndex(user => user.userId === userId);
-        if (index <= -1) {
+    static async remove(userId: string, isAutomatic: boolean = true): Promise<boolean> {
+        const guild = getGuild();
+        const guildMember = guild.members.cache.get(userId);
+
+        if (!guildMember) {
             return false;
         }
 
-        const userIndex = mutedUser.findIndex(user => user.userId === userId);
-        mutedUser.splice(userIndex, 1);
-        return await DatabaseService.updateData({ mutedUser });
+        if (!mutedRole) {
+            return false;
+        }
+
+        if (guildMember.roles.cache.has(mutedRole)) {
+            guildMember.roles.remove(mutedRole);
+        }
+
+        const index = mutedUsers.findIndex(user => user.userId === userId);
+        if (index <= -1) {
+            return false;
+        } else {
+            mutedUsers.splice(index, 1);
+
+            if (isAutomatic) {
+                LoggerService.logMessage({
+                    type: LOG_TYPES.MODERATOR,
+                    msg: `<@!${userId}> was unmuted, time has expired for mute.`,
+                });
+            }
+        }
+
+        return await DatabaseService.updateData({ mutedUsers });
+    }
+
+    /**
+     * Sets the target Mute Role for muting user(s).
+     * @static
+     * @param {string} role
+     * @return {*}  {Promise<boolean>}
+     * @memberof MuteService
+     */
+    static async setMuteRole(role: string): Promise<boolean> {
+        const guild = getGuild();
+       
+        if (!guild.roles.cache.has(role)) {
+            return false;
+        }
+
+        mutedRole = role;
+        return await DatabaseService.updateData({ mutedRole });
     }
 
     /**
@@ -69,12 +150,36 @@ export default class MuteService {
      * @memberof MuteService
      */
     static get(userId: string): IMutedUser | null {
-        const index = mutedUser.findIndex(user => user.userId === userId);
+        const index = mutedUsers.findIndex(user => user.userId === userId);
         if (index <= -1) {
             return null;
         }
 
-        return mutedUser[index];
+        return mutedUsers[index];
+    }
+
+    /**
+     * Tick event to check Mute(s).
+     * @static
+     * @memberof MuteService
+     */
+    static async tick() {
+        if (mutedUsers.length <= 0) {
+            return;
+        }
+
+        for (let i = mutedUsers.length - 1; i >= 0; i--) {
+            const mutedUser = mutedUsers[i];
+            if (!mutedUser.until) {
+                continue;
+            }
+
+            if (Date.now() < mutedUser.until) {
+                continue;
+            }
+
+            await MuteService.remove(mutedUser.userId, true);
+        }
     }
 
     /**
@@ -84,6 +189,6 @@ export default class MuteService {
      * @memberof MuteService
      */
      static getAll(): IMutedUser[] | null {
-        return mutedUser;
+        return mutedUsers;
     }
 }

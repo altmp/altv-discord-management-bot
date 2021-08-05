@@ -1,43 +1,35 @@
 import * as Discord from 'discord.js';
-import { LOG_TYPES } from '../enums/logTypes';
-
 import { ICommand } from '../interfaces/ICommand';
-import { IMutedUser } from '../interfaces/IMutedUser';
-import { DatabaseService } from '../service/database';
-import { LoggerService } from '../service/logger';
+import MuteService from '../service/mutes';
 import generateEmbed from '../utility/embed';
 import RegexUtility from '../utility/regex';
 
 const command: ICommand = {
     command: 'muteinfo',
     description: '<user | id> - Displays info about a muted user.',
-    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, user: string) => {
         const userID = RegexUtility.parseUserID(user);
         const guildMember = msg.guild.members.cache.get(userID);
 
         if (!guildMember) {
-            msg.reply(`${userID} does not exist.`);
+            msg.reply(`${userID} is not in this guild.`);
             return;
         }
 
-        const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
-        const search = mutedUser.find(x => x.userId == userID);
+        const mutedUser = MuteService.get(guildMember.id)
 
-        if (search) {
+        if (mutedUser) {
             const embed = generateEmbed(
                 "Mute Info",
-                `Display Infos about the mute of <@!${search.userId}> || ${search.userId}`
+                `<@!${mutedUser.userId}>`
             );
-            embed.addField("Muted by", `<@!${search.mutedById}> || ${search.mutedById}`);
-            embed.addField("Until", `${search.until ? new Date(search.until) : "Forever"}`);
-            embed.addField("Reason", `${search.reason ? search.reason : "Not Given"}`);
-
-            msg.channel.send("** **", embed);
+            embed.addField("Muted By", `<@!${mutedUser.mutedById}>`);
+            embed.addField("Until", `${mutedUser.until ? new Date(mutedUser.until) : "Forever"}`);
+            embed.addField("Reason", `${mutedUser.reason ? mutedUser.reason : "Not Given"}`);
+            msg.channel.send(embed);
         } else {
             msg.channel.send("The specified User is not muted!");
         }
-        msg.delete();
     }
 }
 
