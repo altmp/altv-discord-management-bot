@@ -14,7 +14,7 @@ const command: ICommand = {
 
         // Note exists already
         if (query != null) {
-            await msg.reply(generateEmbed("Error", "This note already exists!"));
+            await msg.reply(generateEmbed("Error", `Note ${name} already exists!`));
             return;
         }
 
