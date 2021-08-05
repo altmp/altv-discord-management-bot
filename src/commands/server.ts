@@ -7,6 +7,7 @@ import generateEmbed from '../utility/embed';
 const command: ICommand = {
     command: 'server',
     description: 'Fetch a server from the masterlist.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, ...identifier: string[]) => {
         const serverList = await MasterList.getServerList();
         const server = serverList.find(
