@@ -7,6 +7,7 @@ import { ICommand } from '../interfaces/ICommand';
 import { IMutedUser } from '../interfaces/IMutedUser';
 import { DatabaseService } from '../service/database';
 import { LoggerService } from '../service/logger';
+import MuteService from '../service/mutes';
 import generateEmbed from '../utility/embed';
 import RegexUtility from '../utility/regex';
 
@@ -18,7 +19,7 @@ const command: ICommand = {
         if (time == "Forever") time = null;
         const userID = RegexUtility.parseUserID(user);
         const guildMember = msg.guild.members.cache.get(userID);
-        const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
+        const mutedUser: IMutedUser[] = MuteService.getAll();
 
         if (!guildMember) {
             msg.reply(`${userID} does not exist.`);
@@ -35,11 +36,10 @@ const command: ICommand = {
         if (guildMember.roles.cache.has("872509058198949909")) {
             guildMember.roles.remove(mutedRole);
             
-            const search: IMutedUser = mutedUser.find(x => x.userId == guildMember.id);
+            const search: IMutedUser = MuteService.get(guildMember.id);
 
             if (search) {
-                const index: number = mutedUser.indexOf(search);
-                mutedUser.splice(index, 1);
+                MuteService.remove(guildMember.id);
             }
             msg.channel.send(`Unmuted <@${userID}>`);
             LoggerService.logMessage({
@@ -49,7 +49,7 @@ const command: ICommand = {
         } else {
             guildMember.roles.add(mutedRole);
 
-            mutedUser.push({ userId: guildMember.id, mutedById: msg.author.id, until: time ? Date.now() + ms(time) : null, reason: reason.length ? reason.join(' ') : null });
+            MuteService.add(guildMember.id, msg.author.id, time ? Date.now() + ms(time) : null, reason.length ? reason.join(' ') : null);
 
             const embed = generateEmbed(
                 "Mute", 
@@ -66,13 +66,12 @@ const command: ICommand = {
             });
         }
 
-        await DatabaseService.updateData({ mutedUser });
         msg.delete();
     }
 }
 
 export async function checkMutedUser() {
-    let mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
+    let mutedUser: IMutedUser[] = MuteService.getAll();
 
     mutedUser.forEach((mutedUserData) => {
         if (mutedUserData.until != null && Date.now() > mutedUserData.until) {
@@ -82,16 +81,13 @@ export async function checkMutedUser() {
                 user.roles.remove(mutedRole);
             }
 
-            const index: number = mutedUser.indexOf(mutedUserData);
-            mutedUser.splice(index, 1);
+            MuteService.remove(mutedUserData.userId);
             LoggerService.logMessage({
                 type: LOG_TYPES.MODERATOR,
                 msg: `<@!${user.user.id}> got automatically umuted!\nUnmuted User ID: ${user.user.id}`,
             });
         }
     });
-
-    await DatabaseService.updateData({ mutedUser });
 }
 
 export default command;

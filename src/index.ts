@@ -11,6 +11,7 @@ import PermissionService from './service/permissions';
 import { checkLockdownChannel } from './commands/lockdown';
 import { checkMutedUser } from './commands/mute';
 import { IMutedUser } from './interfaces/IMutedUser';
+import MuteService from './service/mutes';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -119,6 +120,7 @@ async function finishConnection() {
     // Run these After Database Initialization
     await LoggerService.init();
     await PermissionService.init();
+    await MuteService.init();
     await client.login(getToken());
     handleTick();
     
