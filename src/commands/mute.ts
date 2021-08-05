@@ -14,7 +14,7 @@ const command: ICommand = {
     command: 'mute',
     description: '<user | id> [minutes] [reason] - Kick a player from the server.',
     skipPermissionCheck: true,
-    execute: async (msg: Discord.Message, user: string, time: string, ...reason) => {
+    execute: async (msg: Discord.Message, user: string, time: string, ...reason: string[]) => {
         if (time == "Forever") time = null;
         const userID = RegexUtility.parseUserID(user);
         const guildMember = msg.guild.members.cache.get(userID);
