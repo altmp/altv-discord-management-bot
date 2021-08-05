@@ -16,6 +16,7 @@ const command: ICommand = {
     execute: async (msg: Discord.Message, user: string, time: string, ...reason) => {
         const userID = RegexUtility.parseUserID(user);
         const guildMember = msg.guild.members.cache.get(userID);
+        const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
 
         if (!guildMember) {
             msg.reply(`${userID} does not exist.`);
@@ -32,13 +33,11 @@ const command: ICommand = {
         if (guildMember.roles.cache.has("872509058198949909")) {
             guildMember.roles.remove(mutedRole);
             
-            const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
             const search: IMutedUser = mutedUser.find(x => x.userId == guildMember.id);
 
             if (search) {
                 const index: number = mutedUser.indexOf(search);
                 mutedUser.splice(index, 1);
-                await DatabaseService.updateData({ mutedUser });
             }
             msg.channel.send(`Unmuted <@${userID}>`);
             LoggerService.logMessage({
@@ -48,7 +47,7 @@ const command: ICommand = {
         } else {
             guildMember.roles.add(mutedRole);
 
-            const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
+            mutedUser.push({ userId: guildMember.id, mutedById: msg.author.id, until: time ? Date.now() + ms(time) : null, reason: reason.length ? reason.join(' ') : null });
 
             mutedUser.push({ userId: guildMember.id, userName: guildMember.user.username, mutedById: msg.author.id, mutedByName: msg.author.username, until: time ? Date.now() + ms(time) : null, reason: reason ? reason.join(' ') : null });
             await DatabaseService.updateData({ mutedUser });
@@ -58,6 +57,8 @@ const command: ICommand = {
                 msg: `<@!${guildMember.id}> got muted by <@!${msg.author.id}>!\nMuted User ID: ${guildMember.id}, Muted By ID: ${msg.author.id}`
             });
         }
+
+        await DatabaseService.updateData({ mutedUser });
     }
 }
 
