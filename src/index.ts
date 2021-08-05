@@ -12,6 +12,7 @@ import { checkLockdownChannel } from './commands/lockdown';
 import { checkMutedUser } from './commands/mute';
 import { IMutedUser } from './interfaces/IMutedUser';
 import MuteService from './service/mutes';
+import { LOG_TYPES } from './enums/logTypes';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -92,6 +93,14 @@ client.on('clickMenu', async (menu) => {
     await menu.reply.edit("Roles were updated successfully.");
 });
 
+client.on('messageDelete', (message: Discord.Message | Discord.PartialMessage) => {
+    console.log(message);
+    LoggerService.logMessage({
+        type: LOG_TYPES.,
+        msg: `Author: <@${message.author.id}>\n\n${message.content}`
+    });
+});
+
 function handleTick() {
     setInterval(async () => {
         await checkLockdownChannel();
@@ -116,14 +125,14 @@ async function finishConnection() {
 
     await CommandService.loadCommands();
     await DatabaseService.init();
-    
+
     // Run these After Database Initialization
     await LoggerService.init();
     await PermissionService.init();
     await MuteService.init();
     await client.login(getToken());
     handleTick();
-    
+
 }
 
 finishConnection();
