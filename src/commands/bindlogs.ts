@@ -8,7 +8,6 @@ import { LoggerService } from '../service/logger';
 const command: ICommand = {
     command: 'bindlogs',
     description: '<type> <channel> - Bind a channel to a log type.',
-    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, type: string, channel: string) => {
         if (!type) {
             msg.reply(`Log type was not specified.`);
