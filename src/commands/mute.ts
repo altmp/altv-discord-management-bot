@@ -76,7 +76,7 @@ export async function checkMutedUser() {
 
     mutedUser.forEach((mutedUserData) => {
         if (mutedUserData.until != null && Date.now() > mutedUserData.until) {
-            const user = getGuild().members.cache.find(x => x.id == mutedUserData.userId);
+            const user = getGuild().members.cache.get(mutedUserData.userId);
             const mutedRole = getGuild().roles.cache.get("872509058198949909");
             if (user != null && user != undefined) {
                 user.roles.remove(mutedRole);
