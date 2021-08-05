@@ -34,8 +34,8 @@ const command: ICommand = {
         }
 
         msg.reply(`Successfully bound log(s) of type ${type.toUpperCase()} to <#${channel}>`);
-        LoggerService.logMessage({ 
-            type: LOG_TYPES.MODERATOR, 
+        LoggerService.logMessage({
+            type: LOG_TYPES.MODERATOR,
             msg: `${msg.author.username}#${msg.author.discriminator} Bound Channel Type '${type}' to <#${channel}>`
         });
     }
