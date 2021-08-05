@@ -27,14 +27,17 @@ const command: ICommand = {
         if (search) {
             const embed = generateEmbed(
                 "Mute Info",
-                `Display Infos about the mute of <@${search.userId}> || ${search.userName}`
+                `Display Infos about the mute of <@!${search.userId}> || ${search.userId}`
             );
-            embed.addField("Muted by", `${search.mutedByName} | <@${search.mutedById}>`);
+            embed.addField("Muted by", `<@!${search.mutedById}> || ${search.mutedById}`);
             embed.addField("Until", `${search.until ? new Date(search.until) : "Forever"}`);
             embed.addField("Reason", `${search.reason ? search.reason : "Not Given"}`);
 
             msg.channel.send("** **", embed);
+        } else {
+            msg.channel.send("The specified User is not muted!");
         }
+        msg.delete();
     }
 }
 
