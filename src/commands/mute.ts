@@ -7,6 +7,7 @@ import { ICommand } from '../interfaces/ICommand';
 import { IMutedUser } from '../interfaces/IMutedUser';
 import { DatabaseService } from '../service/database';
 import { LoggerService } from '../service/logger';
+import generateEmbed from '../utility/embed';
 import RegexUtility from '../utility/regex';
 
 const command: ICommand = {
@@ -14,6 +15,7 @@ const command: ICommand = {
     description: '<user | id> [minutes] [reason] - Kick a player from the server.',
     skipPermissionCheck: true,
     execute: async (msg: Discord.Message, user: string, time: string, ...reason) => {
+        if (time == "Forever") time = null;
         const userID = RegexUtility.parseUserID(user);
         const guildMember = msg.guild.members.cache.get(userID);
         const mutedUser: IMutedUser[] = (await DatabaseService.getData()).mutedUser;
