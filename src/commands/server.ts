@@ -17,8 +17,6 @@ const command: ICommand = {
                 server.name.toLowerCase().includes(identifier.join(' ').toLowerCase())
         );
 
-        console.log(server);
-
         if (!server) {
             msg.reply('Could not find requested server!');
         } else {
