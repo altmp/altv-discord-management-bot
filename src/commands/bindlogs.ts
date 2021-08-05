@@ -8,6 +8,7 @@ import { LoggerService } from '../service/logger';
 const command: ICommand = {
     command: 'bindlogs',
     description: '<type> <channel> - Bind a channel to a log type.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, type: string, channel: string) => {
         if (!type) {
             msg.reply(`Log type was not specified.`);
@@ -34,8 +35,8 @@ const command: ICommand = {
         }
 
         msg.reply(`Successfully bound log(s) of type ${type.toUpperCase()} to <#${channel}>`);
-        LoggerService.logMessage({ 
-            type: LOG_TYPES.MODERATOR, 
+        LoggerService.logMessage({
+            type: LOG_TYPES.MODERATOR,
             msg: `${msg.author.username}#${msg.author.discriminator} Bound Channel Type '${type}' to <#${channel}>`
         });
     }
