@@ -6,6 +6,7 @@ import generateEmbed from '../utility/embed';
 const command: ICommand = {
     command: 'patreon',
     description: 'Link to Patreon.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed(
             'Support the Development of alt:V',

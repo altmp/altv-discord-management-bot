@@ -6,6 +6,7 @@ import generateEmbed from '../utility/embed';
 const command: ICommand = {
     command: 'cef',
     description: 'Link to CEF Wiki Information.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed(
             'Want to Debug CEF?',

@@ -6,6 +6,7 @@ import generateEmbed from '../utility/embed';
 const command: ICommand = {
     command: 'cdn',
     description: 'Link to CDN Wiki Information.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed('Here is some information about CDN');
 
