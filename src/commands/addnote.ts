@@ -7,7 +7,6 @@ import generateEmbed from "../utility/embed";
 const command: ICommand = {
     command: 'addnote',
     description: '!addnote [name] [Content] - Creates a new note from the specified content',
-    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, name: string, ...content: string[]) => {
         const notes: INote[] = (await DatabaseService.getData()).notes;
         const query: INote = notes.find(note => note.name.toLowerCase() == name.toLowerCase())

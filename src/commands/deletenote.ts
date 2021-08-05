@@ -7,7 +7,6 @@ import generateEmbed from "../utility/embed";
 const command: ICommand = {
     command: 'delnote',
     description: '!delnote [name] - Removes a note.',
-    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, name: string) => {
         let notes: INote[] = (await DatabaseService.getData()).notes;
         const query: INote = notes.find(note => note.name.toLowerCase() == name.toLowerCase())
