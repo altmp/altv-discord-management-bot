@@ -4,7 +4,7 @@ import { ILogBinding } from "./ILogBinding";
 import { IReactRole } from "./IReactRole";
 import { ILockdown } from "./ILockdown";
 import { ICommandBinding } from "./ICommandBinding";
-import { INote } from "./INote";
+import {INote} from "./INote";
 
 /**
  * Default Data Layer for Database
