@@ -41,7 +41,10 @@ const command: ICommand = {
                 await DatabaseService.updateData({ mutedUser });
             }
             msg.channel.send(`Unmuted <@${userID}>`);
-            //TODO: Log
+            LoggerService.logMessage({
+                type: LOG_TYPES.COMMANDS,
+                msg: `<@!${guildMember.id}> got unmuted by <@!${msg.author.id}>!\nUnmuted User ID: ${guildMember.id}, Unmuted By ID: ${msg.author.id}`
+            });
         } else {
             guildMember.roles.add(mutedRole);
 
@@ -50,8 +53,10 @@ const command: ICommand = {
             mutedUser.push({ userId: guildMember.id, userName: guildMember.user.username, mutedById: msg.author.id, mutedByName: msg.author.username, until: time ? Date.now() + ms(time) : null, reason: reason ? reason.join(' ') : null });
             await DatabaseService.updateData({ mutedUser });
 
-            msg.channel.send(`Muted <@${userID}>`);
-            //TODO: Log
+            LoggerService.logMessage({
+                type: LOG_TYPES.COMMANDS,
+                msg: `<@!${guildMember.id}> got muted by <@!${msg.author.id}>!\nMuted User ID: ${guildMember.id}, Muted By ID: ${msg.author.id}`
+            });
         }
     }
 }
@@ -69,7 +74,10 @@ export async function checkMutedUser() {
 
             const index: number = mutedUser.indexOf(mutedUserData);
             mutedUser.splice(index, 1);
-            //TODO: Log
+            LoggerService.logMessage({
+                type: LOG_TYPES.MODERATOR,
+                msg: `<@!${user.user.id}> got automatically umuted!\nUnmuted User ID: ${user.user.id}`,
+            });
         }
     });
 
