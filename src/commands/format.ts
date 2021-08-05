@@ -6,6 +6,7 @@ import { ICommand } from '../interfaces/ICommand';
 const command: ICommand = {
     command: 'format',
     description: 'Embed which explains how to use code blocks.',
+    skipPermissionCheck: true,
     execute: async (msg: Discord.Message) => {
         const embed = generateEmbed(
             'Please Format Your Code',
