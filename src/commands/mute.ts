@@ -49,9 +49,15 @@ const command: ICommand = {
 
             mutedUser.push({ userId: guildMember.id, mutedById: msg.author.id, until: time ? Date.now() + ms(time) : null, reason: reason.length ? reason.join(' ') : null });
 
-            mutedUser.push({ userId: guildMember.id, userName: guildMember.user.username, mutedById: msg.author.id, mutedByName: msg.author.username, until: time ? Date.now() + ms(time) : null, reason: reason ? reason.join(' ') : null });
-            await DatabaseService.updateData({ mutedUser });
+            const embed = generateEmbed(
+                "Mute", 
+                `<@!${guildMember.id}>`
+            );
+            embed.addField("Until", time ? new Date(Date.now() + ms(time)) : 'Forever');
+            embed.addField("Reason", reason.length ? reason.join(' ') : 'Not given');
+            embed.setFooter(`Muted User ID: ${guildMember.id}, Muted By ID: ${msg.author.id}`);
 
+            msg.channel.send(`** **`, embed);
             LoggerService.logMessage({
                 type: LOG_TYPES.COMMANDS,
                 msg: `<@!${guildMember.id}> got muted by <@!${msg.author.id}>!\nMuted User ID: ${guildMember.id}, Muted By ID: ${msg.author.id}`
