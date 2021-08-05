@@ -9,6 +9,7 @@ import DiscordButtons from 'discord-buttons'
 import { IReactRole } from './interfaces/IReactRole';
 import PermissionService from './service/permissions';
 import { checkLockdownChannel } from './commands/lockdown';
+import { LOG_TYPES } from './enums/logTypes';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -79,6 +80,14 @@ client.on('clickMenu', async (menu) => {
     await menu.reply.edit("Roles were updated successfully.");
 });
 
+client.on('messageDelete', (message: Discord.Message | Discord.PartialMessage) => {
+    console.log(message);
+    LoggerService.logMessage({
+        type: LOG_TYPES.DELETED,
+        msg: `Author: <@${message.author.id}>\n\n${message.content}`
+    });
+});
+
 function handleTick() {
     setInterval(async () => {
         await checkLockdownChannel();
@@ -102,13 +111,13 @@ async function finishConnection() {
 
     await CommandService.loadCommands();
     await DatabaseService.init();
-    
+
     // Run these After Database Initialization
     await LoggerService.init();
     await PermissionService.init();
     await client.login(getToken());
     handleTick();
-    
+
 }
 
 finishConnection();
