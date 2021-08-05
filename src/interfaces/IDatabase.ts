@@ -5,6 +5,7 @@ import { IReactRole } from "./IReactRole";
 import { ILockdown } from "./ILockdown";
 import { ICommandBinding } from "./ICommandBinding";
 import { IMutedUser } from "./IMutedUser";
+import { IBotConfig } from "./IBotConfig";
 
 /**
  * Default Data Layer for Database
@@ -26,6 +27,13 @@ export interface IDatabase {
      * @memberof IDatabase
      */
     responses?: Array<IResponse>;
+
+    /**
+     * Custom command responses.
+     * @type {IBotConfig}
+     * @memberof IDatabase
+     */
+    config?: IBotConfig;
 
     /**
      * Bound Log Channels

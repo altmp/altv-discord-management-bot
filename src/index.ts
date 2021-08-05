@@ -13,9 +13,11 @@ import { checkMutedUser } from './commands/mute';
 import { IMutedUser } from './interfaces/IMutedUser';
 import MuteService from './service/mutes';
 import { LOG_TYPES } from './enums/logTypes';
+import { IBotConfig } from './interfaces/IBotConfig';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
+export let config: IBotConfig;
 
 client.on('ready', async () => {
     console.log('Started Bot');
@@ -94,7 +96,6 @@ client.on('clickMenu', async (menu) => {
 });
 
 client.on('messageDelete', (message: Discord.Message | Discord.PartialMessage) => {
-    console.log(message);
     LoggerService.logMessage({
         type: LOG_TYPES.DELETED,
         msg: `Author: <@${message.author.id}>\n\n${message.content}`
@@ -132,7 +133,7 @@ async function finishConnection() {
     await MuteService.init();
     await client.login(getToken());
     handleTick();
-
+    config = (await DatabaseService.getData()).config;
 }
 
 finishConnection();

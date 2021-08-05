@@ -1,6 +1,6 @@
 import * as Discord from 'discord.js';
 import ms from 'ms';
-import { getGuild } from '..';
+import { config, getGuild } from '..';
 import { LOG_TYPES } from '../enums/logTypes';
 
 import { ICommand } from '../interfaces/ICommand';
@@ -26,14 +26,14 @@ const command: ICommand = {
             return;
         }
 
-        const mutedRole = msg.guild.roles.cache.get("872509058198949909");
+        const mutedRole = msg.guild.roles.cache.get(config.muteRole);
 
         if (!mutedRole) {
             msg.reply(`Role does not exist.`);
             return;
         }
 
-        if (guildMember.roles.cache.has("872509058198949909")) {
+        if (guildMember.roles.cache.has(config.muteRole)) {
             guildMember.roles.remove(mutedRole);
             
             const search: IMutedUser = MuteService.get(guildMember.id);
@@ -76,7 +76,7 @@ export async function checkMutedUser() {
     mutedUser.forEach((mutedUserData) => {
         if (mutedUserData.until != null && Date.now() > mutedUserData.until) {
             const user = getGuild().members.cache.get(mutedUserData.userId);
-            const mutedRole = getGuild().roles.cache.get("872509058198949909");
+            const mutedRole = getGuild().roles.cache.get(config.muteRole);
             if (user != null && user != undefined) {
                 user.roles.remove(mutedRole);
             }
