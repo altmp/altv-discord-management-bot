@@ -9,14 +9,11 @@ import DiscordButtons from 'discord-buttons'
 import { IReactRole } from './interfaces/IReactRole';
 import PermissionService from './service/permissions';
 import { checkLockdownChannel } from './commands/lockdown';
-import { IMutedUser } from './interfaces/IMutedUser';
 import MuteService from './service/mutes';
 import { LOG_TYPES } from './enums/logTypes';
-import { IBotConfig } from './interfaces/IBotConfig';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
-export let config: IBotConfig;
 
 client.on('ready', async () => {
     console.log('Started Bot');
@@ -126,7 +123,6 @@ async function finishConnection() {
     await MuteService.init();
     await client.login(getToken());
     handleTick();
-    config = (await DatabaseService.getData()).config;
 }
 
 finishConnection();
