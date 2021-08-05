@@ -96,7 +96,7 @@ client.on('clickMenu', async (menu) => {
 client.on('messageDelete', (message: Discord.Message | Discord.PartialMessage) => {
     console.log(message);
     LoggerService.logMessage({
-        type: LOG_TYPES.,
+        type: LOG_TYPES.DELETED,
         msg: `Author: <@${message.author.id}>\n\n${message.content}`
     });
 });
