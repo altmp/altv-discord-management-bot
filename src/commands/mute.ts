@@ -59,6 +59,7 @@ const command: ICommand = {
         }
 
         await DatabaseService.updateData({ mutedUser });
+        msg.delete();
     }
 }
 
