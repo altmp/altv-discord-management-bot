@@ -53,7 +53,7 @@ const command: ICommand = {
 
             const embed = generateEmbed(
                 "Mute", 
-                `<@!${guildMember.id}>`
+                `<@!${guildMember.id}> has been muted!`
             );
             embed.addField("Until", time ? new Date(Date.now() + ms(time)) : 'Forever');
             embed.addField("Reason", reason.length ? reason.join(' ') : 'Not given');
