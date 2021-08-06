@@ -8,9 +8,9 @@ import getToken from './utility/token';
 import DiscordButtons from 'discord-buttons'
 import { IReactRole } from './interfaces/IReactRole';
 import PermissionService from './service/permissions';
-import { checkLockdownChannel } from './commands/lockdown';
 import MuteService from './service/mutes';
 import { LOG_TYPES } from './enums/logTypes';
+import LockdownService from './service/lockdowns';
 
 const client = new Discord.Client({ ws: { intents: new Discord.Intents(Discord.Intents.ALL) } });
 let guild: Discord.Guild;
@@ -94,7 +94,7 @@ client.on('messageDelete', (message: Discord.Message | Discord.PartialMessage) =
 
 function handleTick() {
     setInterval(async () => {
-        await checkLockdownChannel();
+        await LockdownService.tick();
         await MuteService.tick();
     }, 2500);
 }
@@ -121,6 +121,7 @@ async function finishConnection() {
     await LoggerService.init();
     await PermissionService.init();
     await MuteService.init();
+    await LockdownService.init();
     await client.login(getToken());
     handleTick();
 }
