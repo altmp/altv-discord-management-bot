@@ -9,7 +9,6 @@ import RegexUtility from '../utility/regex';
 const command: ICommand = {
     command: 'lockdown',
     description: '<channel> <minutes> - Locks a Channel.',
-    skipPermissionCheck: true,
     execute: async (msg: Discord.Message, id: string, time: string) => {
         const channelId = RegexUtility.parseChannelID(id);
         const channel = msg.guild.channels.cache.get(channelId) as Discord.TextChannel;
